@@ -43,6 +43,7 @@ dependencies:
   provider: ^3.0.0+1
   url_launcher: ^5.4.10
   auto_size_text: ^2.1.0
+  syncfusion_flutter_calendar: ^18.4.30
 
 dev_dependencies:
   flutter_test:

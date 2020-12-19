@@ -106,6 +106,8 @@ class _LoginViewState extends State<LoginView> {
       ),
           Container(
             alignment: Alignment.center,
+              // decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.all(Radius.circular(30.0))),
             child: Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15.0),

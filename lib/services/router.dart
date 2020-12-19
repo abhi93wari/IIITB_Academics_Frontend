@@ -11,8 +11,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case LoginViewRoute:
       return MaterialPageRoute(builder: (context) =>LoginView());
+      break;
     case TimeTableViewRoute:
       return MaterialPageRoute(builder: (context) =>TimeTableView());
+      break;
     default:
       return MaterialPageRoute(builder: (context) => UndefinedView(name: settings.name,));
   }
