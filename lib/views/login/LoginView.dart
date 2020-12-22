@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iiitb_academics/models/TimeTableModel.dart';
+import 'package:iiitb_academics/services/CommonData.dart';
+import 'package:iiitb_academics/services/Networks.dart';
 import 'package:iiitb_academics/services/router_constants.dart';
 import 'package:iiitb_academics/views/timetable/timeTableView.dart';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 
 class LoginView extends StatefulWidget {
   @override
@@ -65,10 +71,32 @@ class _LoginViewState extends State<LoginView> {
             //CommonData.isLoading=true;
           });
     });
+    try {
+      String apiurl ="http://localhost:8080/api/Students/";
+      print("email is "+email);
+      http.Response response = await http.get(apiurl+email);
+      if(response.statusCode==200) {
+        print(response.body);
+        print("found data");
+        var data = response.body;
+        print(data);
+        var myjson = jsonDecode(data);
+        print(myjson);
+
+        var timeTable = TimeTableModel.fromJson(myjson);
+        CommonData.currentModel = timeTable;
+      }
+      else{
+        print("error");
+      }
+    } on Exception catch (e) {
+      // TODO
+      print("Exception "+e.toString());
+    }
 
 
-    Future.delayed(Duration(seconds: 2),()  async {
-      //int val = await Networks.saveField("graduation_degree", newValue);
+    Future.delayed(Duration(seconds: 0),()  async {
+      //bool val = await Networks.loginandgetUserData(email);
       if(true){
         setState(() {
           Navigator.pop(context); //for dialog

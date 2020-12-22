@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iiitb_academics/models/Courses.dart';
+import 'package:iiitb_academics/models/DaysList.dart';
 import 'package:iiitb_academics/models/Meeting.dart';
 import 'package:iiitb_academics/models/MeetingDataSource.dart';
+import 'package:iiitb_academics/services/CommonData.dart';
+import 'package:iiitb_academics/services/router_constants.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class TimeTableView extends StatefulWidget {
@@ -78,7 +82,6 @@ class _TimeTableViewState extends State<TimeTableView> {
   @override
   Widget build(BuildContext context) {
     final Widget _calendar = Theme(
-
       /// The key set here to maintain the state, when we change
       /// the parent of the widget
         key: _globalKey,
@@ -93,6 +96,7 @@ class _TimeTableViewState extends State<TimeTableView> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        automaticallyImplyLeading: false,
         iconTheme: IconThemeData(
           color: Colors.black, //change your color here
         ),
@@ -105,12 +109,15 @@ class _TimeTableViewState extends State<TimeTableView> {
                 color: Colors.black
             ),
           ),
-          trailing: Text(
-            "Logout", textAlign: TextAlign.right,
-            style: GoogleFonts.nunito(
-                fontSize: 15,
-                fontWeight: FontWeight.w400,
-                color: Colors.black
+          trailing: InkWell(
+            onTap: logout,
+            child: Text(
+              "Logout", textAlign: TextAlign.right,
+              style: GoogleFonts.nunito(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black
+              ),
             ),
           ),
         ),
@@ -163,72 +170,163 @@ class _TimeTableViewState extends State<TimeTableView> {
     });
   }
 
+  WeekDays getDay(String day){
+    switch (day){
+      case "MON":
+        return WeekDays.monday;
+        break;
+      case "TUE":
+        return WeekDays.tuesday;
+        break;
+      case "WED":
+        return WeekDays.wednesday;
+        break;
+      case "FRI":
+        return WeekDays.friday;
+        break;
+      case "SAT":
+        return WeekDays.saturday;
+        break;
+      case "THU":
+        return WeekDays.thursday;
+        break;
+      default:
+        return WeekDays.sunday;
+    }
+
+  }
+
   void _createRecursiveAppointments() {
     final Random random = Random();
 
-    final DateTime currentDate = DateTime.now();
-    final DateTime startTime =
-    DateTime(currentDate.year, currentDate.month, currentDate.day, 9, 0, 0);
-    final DateTime endTime = DateTime(
-        currentDate.year, currentDate.month, currentDate.day, 11, 0, 0);
+    List<Courses> courseList  = CommonData.currentModel.courses;
+
+    for(Courses c in courseList){
+      for(DaysList d in c.daysList) {
+        final Appointment weeklyAppointment = Appointment();
+        String duration = d.time; //16:00-18:00
+        List<String> times = duration.split("-");
+        String start = times.first;//16:00
+        String end = times.last;//18:00
+
+        List<String> start1 = start.split(":");//16:00
+        String starthour = start1.first;//16
+        String startmin = start1.last;//00
+
+        List<String> end1 = end.split(":");
+        String endhour = end1.first;
+        String endmin = end1.last;
+
+        final DateTime currentDate = DateTime.now();
+        final DateTime startTime =
+        DateTime(currentDate.year, currentDate.month, currentDate.day, int.parse(starthour), int.parse(startmin), 0);
+        final DateTime endTime = DateTime(
+            currentDate.year, currentDate.month, currentDate.day, int.parse(endhour), int.parse(endmin), 0);
+
+        weeklyAppointment.startTime = startTime;
+        weeklyAppointment.endTime = endTime;
+
+        weeklyAppointment.color = colorCollection[random.nextInt(9)];
+        weeklyAppointment.subject = c.courseCode+" - "+c.name+"/n"+d.room;
 
 
-    //Recurrence Appointment 2
-    final Appointment weeklyAppointment = Appointment();
-    final DateTime startTime1 = DateTime(
-        currentDate.year, currentDate.month, currentDate.day, 13, 0, 0);
-    final DateTime endTime1 = DateTime(
-        currentDate.year, currentDate.month, currentDate.day, 15, 0, 0);
-    weeklyAppointment.startTime = startTime1;
-    weeklyAppointment.endTime = endTime1;
-    weeklyAppointment.color = colorCollection[random.nextInt(9)];
-    weeklyAppointment.subject = 'Algorithm';
 
-    final RecurrenceProperties recurrencePropertiesForWeeklyAppointment =
-    RecurrenceProperties();
-    recurrencePropertiesForWeeklyAppointment.recurrenceType =
-        RecurrenceType.weekly;
-    recurrencePropertiesForWeeklyAppointment.recurrenceRange =
-        RecurrenceRange.count;
-    recurrencePropertiesForWeeklyAppointment.interval = 1;
-    recurrencePropertiesForWeeklyAppointment.weekDays = <WeekDays>[]
-      ..add(WeekDays.monday);
-    recurrencePropertiesForWeeklyAppointment.recurrenceCount = 20;
-    weeklyAppointment.recurrenceRule = SfCalendar.generateRRule(
-        recurrencePropertiesForWeeklyAppointment,
-        weeklyAppointment.startTime,
-        weeklyAppointment.endTime);
-    _appointments.add(weeklyAppointment);
+        DateTime termstart =
+        DateTime.parse('2020-08-20');
+
+        print("termstart day is "+termstart.toString());
+
+        DateTime termend =
+        DateTime.parse('2020-12-28');
+
+        RecurrenceProperties recurrencePropertiesForWeeklyAppointment =
+        RecurrenceProperties();
+        recurrencePropertiesForWeeklyAppointment.recurrenceType =
+            RecurrenceType.weekly;
+        recurrencePropertiesForWeeklyAppointment.startDate = termstart;
+        recurrencePropertiesForWeeklyAppointment.endDate = termend;
+        recurrencePropertiesForWeeklyAppointment.recurrenceRange =
+            RecurrenceRange.endDate;
+
+        recurrencePropertiesForWeeklyAppointment.interval = 1;
+        recurrencePropertiesForWeeklyAppointment.weekDays = <WeekDays>[]
+          ..add(getDay(d.day));
+        //recurrencePropertiesForWeeklyAppointment.recurrenceCount = 200;
+        weeklyAppointment.recurrenceRule = SfCalendar.generateRRule(
+            recurrencePropertiesForWeeklyAppointment,
+            weeklyAppointment.startTime,
+            weeklyAppointment.endTime);
+        _appointments.add(weeklyAppointment);
 
 
-    final Appointment customWeeklyAppointment = Appointment();
-    final DateTime startTime5 = DateTime(
-        currentDate.year, currentDate.month, currentDate.day, 12, 0, 0);
-    final DateTime endTime5 = DateTime(
-        currentDate.year, currentDate.month, currentDate.day, 13, 0, 0);
-    customWeeklyAppointment.startTime = startTime5;
-    customWeeklyAppointment.endTime = endTime5;
-    customWeeklyAppointment.color = colorCollection[random.nextInt(9)];
-    customWeeklyAppointment.subject = 'Machine Learning';
 
-    final RecurrenceProperties recurrencePropertiesForCustomWeeklyAppointment =
-    RecurrenceProperties();
-    recurrencePropertiesForCustomWeeklyAppointment.recurrenceType =
-        RecurrenceType.weekly;
-    recurrencePropertiesForCustomWeeklyAppointment.recurrenceRange =
-        RecurrenceRange.endDate;
-    recurrencePropertiesForCustomWeeklyAppointment.interval = 1;
-    recurrencePropertiesForCustomWeeklyAppointment.weekDays = <WeekDays>[
-      WeekDays.monday,
-      WeekDays.friday
-    ];
-    recurrencePropertiesForCustomWeeklyAppointment.endDate =
-        DateTime.now().add(const Duration(days: 14));
-    customWeeklyAppointment.recurrenceRule = SfCalendar.generateRRule(
-        recurrencePropertiesForCustomWeeklyAppointment,
-        customWeeklyAppointment.startTime,
-        customWeeklyAppointment.endTime);
-    _appointments.add(customWeeklyAppointment);
+
+
+      }
+
+    }
+
+
+
+
+
+    //
+    // //Recurrence Appointment 2
+    // final Appointment weeklyAppointment = Appointment();
+    // final DateTime startTime1 = DateTime(
+    //     currentDate.year, currentDate.month, currentDate.day, 13, 0, 0);
+    // final DateTime endTime1 = DateTime(
+    //     currentDate.year, currentDate.month, currentDate.day, 15, 0, 0);
+    // weeklyAppointment.startTime = startTime1;
+    // weeklyAppointment.endTime = endTime1;
+    // weeklyAppointment.color = colorCollection[random.nextInt(9)];
+    // weeklyAppointment.subject = 'Algorithm';
+    //
+    // final RecurrenceProperties recurrencePropertiesForWeeklyAppointment =
+    // RecurrenceProperties();
+    // recurrencePropertiesForWeeklyAppointment.recurrenceType =
+    //     RecurrenceType.weekly;
+    // recurrencePropertiesForWeeklyAppointment.recurrenceRange =
+    //     RecurrenceRange.count;
+    // recurrencePropertiesForWeeklyAppointment.interval = 1;
+    // recurrencePropertiesForWeeklyAppointment.weekDays = <WeekDays>[]
+    //   ..add(WeekDays.monday);
+    // recurrencePropertiesForWeeklyAppointment.recurrenceCount = 20;
+    // weeklyAppointment.recurrenceRule = SfCalendar.generateRRule(
+    //     recurrencePropertiesForWeeklyAppointment,
+    //     weeklyAppointment.startTime,
+    //     weeklyAppointment.endTime);
+    // _appointments.add(weeklyAppointment);
+    //
+    //
+    // final Appointment customWeeklyAppointment = Appointment();
+    // final DateTime startTime5 = DateTime(
+    //     currentDate.year, currentDate.month, currentDate.day, 12, 0, 0);
+    // final DateTime endTime5 = DateTime(
+    //     currentDate.year, currentDate.month, currentDate.day, 13, 0, 0);
+    // customWeeklyAppointment.startTime = startTime5;
+    // customWeeklyAppointment.endTime = endTime5;
+    // customWeeklyAppointment.color = colorCollection[random.nextInt(9)];
+    // customWeeklyAppointment.subject = 'Machine Learning';
+    //
+    // final RecurrenceProperties recurrencePropertiesForCustomWeeklyAppointment =
+    // RecurrenceProperties();
+    // recurrencePropertiesForCustomWeeklyAppointment.recurrenceType =
+    //     RecurrenceType.weekly;
+    // recurrencePropertiesForCustomWeeklyAppointment.recurrenceRange =
+    //     RecurrenceRange.endDate;
+    // recurrencePropertiesForCustomWeeklyAppointment.interval = 1;
+    // recurrencePropertiesForCustomWeeklyAppointment.weekDays = <WeekDays>[
+    //   WeekDays.monday,
+    //   WeekDays.friday
+    // ];
+    // recurrencePropertiesForCustomWeeklyAppointment.endDate =
+    //     DateTime.now().add(const Duration(days: 14));
+    // customWeeklyAppointment.recurrenceRule = SfCalendar.generateRRule(
+    //     recurrencePropertiesForCustomWeeklyAppointment,
+    //     customWeeklyAppointment.startTime,
+    //     customWeeklyAppointment.endTime);
+    // _appointments.add(customWeeklyAppointment);
 
 
   }
@@ -326,6 +424,11 @@ class _TimeTableViewState extends State<TimeTableView> {
     }
   }
 
+
+  void logout() {
+    Navigator.pop(context); //for login page
+    Navigator.pushNamed(context, HomePage);
+  }
 }
 /// An object to set the appointment collection data source to collection, and
 /// allows to add, remove or reset the appointment collection.
