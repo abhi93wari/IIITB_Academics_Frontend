@@ -101,6 +101,11 @@ class _LoginViewState extends State<LoginView> {
         //var timeTable = TimeTableModel.fromJson({"student_id":1,"first_name":"SANDEEP","last_name":"KUMAR JHA","roll_no":"MT2020087","email":"sandeep.jha@iiitb.org","courses":[{"course_id":1,"course_code":"AI511","name":"Machine Learning","faculty":0,"faculty_name":"G Srinivasana","ta_name":"Tejas Kotha","daysList":[{"time":"16:00-18:00","day":"MON","room":"R302"},{"time":"11:00-13:00","day":"TUE","room":"R302"},{"time":"11:00-13:00","day":"FRI","room":"R302"}]},{"course_id":2,"course_code":"AI512","name":"MML","faculty":0,"faculty_name":"V Ram","ta_name":null,"daysList":[{"time":"11:00-13:00","day":"MON","room":"R302"},{"time":"11:00-13:00","day":"THU","room":"R305"}]},{"course_id":3,"course_code":"CS511","name":"ALGO","faculty":0,"faculty_name":"V Murli","ta_name":null,"daysList":[{"time":"09:00-11:00","day":"WED","room":"R302"},{"time":"09:00-11:00","day":"SAT","room":"R308"}]},{"course_id":4,"course_code":"CS512","name":"SS","faculty":0,"faculty_name":"R ChandraShekhar","ta_name":"Shubham Aggarwal","daysList":[{"time":"16:00-18:00","day":"WED","room":"R302"},{"time":"14:00-16:00","day":"FRI","room":"R307"}]}]});
         var timeTable = TimeTableModel.fromJson(myjson);
         CommonData.currentModel = timeTable;
+        setState(() {
+          Navigator.pop(context); //for dialog
+          Navigator.pop(context); //for login page
+          Navigator.pushNamed(context, TimeTableViewRoute);
+        });
       }
       else{
         print("error");
