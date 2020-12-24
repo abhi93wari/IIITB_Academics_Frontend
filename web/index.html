@@ -28,6 +28,21 @@
 
   <title>iiitb_academics</title>
   <link rel="manifest" href="manifest.json">
+  <script type="text/javascript">
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'UA-233131-38');
+
+		async function download() {
+			var pdfAsDataUri = "data:application/pdf;base64, " + pdfdata;
+			var link = document.createElement('a');
+			link.download = filename;
+			link.href = pdfAsDataUri;
+			link.type = 'application/pdf';
+			link.click();
+		}
+</script>
 </head>
 <body>
   <!-- This script installs service_worker.js to provide PWA functionality to
@@ -41,5 +56,6 @@
     }
   </script>
   <script src="main.dart.js" type="application/javascript"></script>
+
 </body>
 </html>
