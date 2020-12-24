@@ -6,6 +6,9 @@ class TimeTableModel {
   String _lastName;
   String _rollNo;
   String _email;
+  String _domain;
+  String _specCode;
+  String _specName;
   List<Courses> _courses;
 
   TimeTableModel(
@@ -14,12 +17,18 @@ class TimeTableModel {
         String lastName,
         String rollNo,
         String email,
+        String domain,
+        String specCode,
+        String specName,
         List<Courses> courses}) {
     this._studentId = studentId;
     this._firstName = firstName;
     this._lastName = lastName;
     this._rollNo = rollNo;
     this._email = email;
+    this._domain = domain;
+    this._specCode = specCode;
+    this._specName = specName;
     this._courses = courses;
   }
 
@@ -33,6 +42,12 @@ class TimeTableModel {
   set rollNo(String rollNo) => _rollNo = rollNo;
   String get email => _email;
   set email(String email) => _email = email;
+  String get domain => _domain;
+  set domain(String domain) => _domain = domain;
+  String get specCode => _specCode;
+  set specCode(String specCode) => _specCode = specCode;
+  String get specName => _specName;
+  set specName(String specName) => _specName = specName;
   List<Courses> get courses => _courses;
   set courses(List<Courses> courses) => _courses = courses;
 
@@ -42,6 +57,9 @@ class TimeTableModel {
     _lastName = json['last_name'];
     _rollNo = json['roll_no'];
     _email = json['email'];
+    _domain = json['domain'];
+    _specCode = json['spec_code'];
+    _specName = json['spec_name'];
     if (json['courses'] != null) {
       _courses = new List<Courses>();
       json['courses'].forEach((v) {
@@ -57,6 +75,9 @@ class TimeTableModel {
     data['last_name'] = this._lastName;
     data['roll_no'] = this._rollNo;
     data['email'] = this._email;
+    data['domain'] = this._domain;
+    data['spec_code'] = this._specCode;
+    data['spec_name'] = this._specName;
     if (this._courses != null) {
       data['courses'] = this._courses.map((v) => v.toJson()).toList();
     }

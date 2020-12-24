@@ -131,7 +131,7 @@ class _TimeTableViewState extends State<TimeTableView> {
         mainAxisSize: MainAxisSize.max,
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -145,13 +145,13 @@ class _TimeTableViewState extends State<TimeTableView> {
     color: Colors.blueAccent,
     //margin: EdgeInsets.symmetric(vertical: 37.0,horizontal: 26.0),
     child: Padding(
-    padding: const EdgeInsets.all(16.0),
+    padding: const EdgeInsets.all(18.0),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children :[ Text(
-    "Name- ${CommonData.currentModel.firstName} ${CommonData.currentModel.lastName}\nRoll No- ${CommonData.currentModel.rollNo}\nEmail - ${CommonData.currentModel.email} ",
+    "Name- ${CommonData.currentModel.firstName} ${CommonData.currentModel.lastName}\nRoll No- ${CommonData.currentModel.rollNo}\nEmail - ${CommonData.currentModel.email}\nDomain-${CommonData.currentModel.domain}\nSpec.-${CommonData.currentModel.specCode}-${CommonData.currentModel.specName} ",
     style: GoogleFonts.nunito(
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: FontWeight.w800,
     color: Colors.white
     ),
@@ -181,7 +181,7 @@ class _TimeTableViewState extends State<TimeTableView> {
      Text(
         getCourses(),
         style: GoogleFonts.nunito(
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
               color: Colors.white
         ),
@@ -198,30 +198,27 @@ class _TimeTableViewState extends State<TimeTableView> {
 
           Expanded(
             flex:8,
-            child: RepaintBoundary(
-              key: scr,
-              child: Row(children: <Widget>[
-                Expanded(
-                child: calendarController.view == CalendarView.month &&
-                true &&
-                _screenHeight < 800
-                ? Scrollbar(
-                isAlwaysShown: true,
+            child: Row(children: <Widget>[
+              Expanded(
+              child: calendarController.view == CalendarView.month &&
+              true &&
+              _screenHeight < 800
+              ? Scrollbar(
+              isAlwaysShown: true,
+              controller: controller,
+              child: ListView(
                 controller: controller,
-                child: ListView(
-                  controller: controller,
-                  children: <Widget>[
-                    Container(
-                      color: Colors.amber,
-                      height: 600,
-                      child: _calendar,
-                    )
-                  ],
-                ))
-                : Container(color: Colors.amber, child: _calendar),
+                children: <Widget>[
+                  Container(
+                    color: Colors.amber,
+                    height: 600,
+                    child: _calendar,
+                  )
+                ],
+              ))
+              : Container(color: Colors.amber, child: _calendar),
     )
     ]),
-            ),
           ),
         ],
       )
