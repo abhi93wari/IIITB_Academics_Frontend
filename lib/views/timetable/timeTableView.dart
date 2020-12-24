@@ -1,4 +1,5 @@
 
+import 'dart:collection';
 import 'dart:html';
 import 'dart:math';
 ///Dart imports
@@ -15,6 +16,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
@@ -259,20 +261,35 @@ class _TimeTableViewState extends State<TimeTableView> {
   // }
 
 
+
+  Future<List<int>> _readImageData() async {
+    final ByteData data = await rootBundle.load('images/iiitb_logo.png');
+    return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  }
+
   Future<void> generatePDF() async {
 
-
-    // final pdf = pw.Document();
-    //
-    // pdf.addPage(pw.Page(
-    //     pageFormat: PdfPageFormat.a4,
-    //     build: (pw.Context context) {
-    //       return pw.(
-    //         child: pw.Text("Hello World"),
-    //       ); // Center
-    //     }));
-
     PdfDocument document = PdfDocument();
+
+    final PdfPage page = document.pages.add();
+    //Get page client size
+    final Size pageSize = page.getClientSize();
+
+    // page.graphics.drawImage(PdfBitmap(await _readImageData()),
+    //     Rect.fromLTWH(0, 0, pageSize.width, pageSize.height));
+
+
+    page.graphics.drawRectangle(
+        brush: PdfSolidBrush(PdfColor(91, 126, 215, 255)),
+        bounds: Rect.fromLTWH(0, 0, pageSize.width, 90));
+    //Draw string
+    page.graphics.drawString(
+        "Time Table", PdfStandardFont(PdfFontFamily.helvetica, 30),
+        brush: PdfBrushes.white,
+        bounds: Rect.fromLTWH(pageSize.width/3, 0, pageSize.width, 90),
+        format: PdfStringFormat(lineAlignment: PdfVerticalAlignment.middle));
+
+
 
 //Create a PdfGrid class
     PdfGrid grid = PdfGrid();
@@ -293,52 +310,58 @@ class _TimeTableViewState extends State<TimeTableView> {
     header.cells[5].value = 'FRI';
     header.cells[6].value = 'SAT';
 //Add rows to grid
+    List<Courses> courseList  = CommonData.currentModel.courses;
+
     PdfGridRow row0 = grid.rows.add();
     row0.cells[0].value = '9AM-11AM';
-    row0.cells[3].value = "Algorithm";
-    row0.cells[6].value = "Algorithm";
-
 
     PdfGridRow row1 = grid.rows.add();
     row1.cells[0].value = '11AM-1PM';
-    row1.cells[1].value = "MML";
-    row1.cells[2].value = "ML";
-    row1.cells[4].value = "MML";
-    row1.cells[5].value = "ML";
+
 
     PdfGridRow row2 = grid.rows.add();
     row2.cells[0].value = '1PM-3PM';
-    row2.cells[5].value = "SS";
+
     PdfGridRow row3 = grid.rows.add();
     row3.cells[0].value = '3PM-5PM';
-    row3.cells[1].value = "ML";
-    row3.cells[3].value = "SS";
-    List<Courses> courseList  = CommonData.currentModel.courses;
+
+
+
+    HashMap map = new HashMap<String, int>();
+    map["MON"]  = 1;
+    map["TUE"]  = 2;
+    map["WED"]  = 3;
+    map["THU"]  = 4;
+    map["FRI"]  = 5;
+    map["SAT"]  = 6;
+
+
+
+
+
 
     for(Courses c in courseList){
       for(DaysList d in c.daysList) {
 
         String duration = d.time; //16:00-18:00
         String day = d.day;
-
-        for(int i = 0;i<grid.columns.count;i++){
-          if(header.cells[i].value==day){
-            for(int j=0;j<grid.rows.count;j++){
-
-            }
-          }
+        
+        if(duration.startsWith('09')){
+          int i = map[day];
+          row0.cells[i].value = c.name;
         }
-        List<String> times = duration.split("-");
-        String start = times.first;//16:00
-        String end = times.last;//18:00
-
-        List<String> start1 = start.split(":");//16:00
-        String starthour = start1.first;//16
-        String startmin = start1.last;//00
-
-        List<String> end1 = end.split(":");
-        String endhour = end1.first;
-        String endmin = end1.last;
+        if(duration.startsWith('11')){
+          int i = map[day];
+          row1.cells[i].value = c.name;
+        }
+        if(duration.startsWith('13')){
+          int i = map[day];
+          row2.cells[i].value = c.name;
+        }
+        if(duration.startsWith('15')){
+          int i = map[day];
+          row3.cells[i].value = c.name;
+        }
 
       }
     }
@@ -355,12 +378,12 @@ class _TimeTableViewState extends State<TimeTableView> {
 
 //Draw the grid
     grid.draw(
-        page: document.pages.add(), bounds: const Rect.fromLTWH(0, 0, 0, 0));
+        page: page, bounds:  Rect.fromLTWH(0, 90, 0,0));
 
 //Save and dispose the PDF document
     final List<int> bytes = document.save();
     document.dispose();
-    await saveAndLaunchFile(bytes, 'Invoice.pdf');
+    await saveAndLaunchFile(bytes, 'timetable.pdf');
 
   }
 
@@ -448,7 +471,7 @@ class _TimeTableViewState extends State<TimeTableView> {
         DateTime termend = DateTime(
             currentDate.year, currentDate.month+1, currentDate.day, int.parse(endhour), int.parse(endmin), 0);
 
-        print("termstart day is "+termstart.toString());
+       // print("termstart day is "+termstart.toString());
 
 
         DateTime.parse('2020-12-28');
